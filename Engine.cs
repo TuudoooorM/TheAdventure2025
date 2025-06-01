@@ -172,7 +172,7 @@ public class Engine
             int centerX = pos.X;
             int centerY = pos.Y - 4;
             byte blue = 255, alpha = 50;
-            _renderer.DrawCircle(centerX, centerY, radius, 0, 0, blue, alpha, filled: true);
+            _renderer.DrawCircle(centerX, centerY, radius, 0, 0, blue, alpha);
         }
 
         _renderer.PresentFrame();
@@ -204,7 +204,6 @@ public class Engine
             var deltaY = Math.Abs(_player.Position.Y - tempGameObject.Position.Y);
             if (deltaX < 32 && deltaY < 32)
             {
-                Console.WriteLine(_player.State.State);
                 if (tempGameObject.SpriteSheet.FileName == "powerup_shield.png")
                 {
                     _shieldActive = true;
