@@ -26,7 +26,7 @@ public class Engine
     private TextureData _deathScreenTextureData;
     
     private bool _shieldActive = false;
-    private DateTime _shieldEndTime = DateTime.MinValue;
+    private DateTimeOffset _shieldEndTime = DateTimeOffset.MinValue;
     private const int ShieldDuration = 5000; 
 
     public Engine(GameRenderer renderer, Input input)
@@ -207,7 +207,7 @@ public class Engine
                 if (tempGameObject.SpriteSheet.FileName == "powerup_shield.png")
                 {
                     _shieldActive = true;
-                    _shieldEndTime = DateTime.Now.AddMilliseconds(ShieldDuration);
+                    _shieldEndTime = DateTimeOffset.Now.AddMilliseconds(ShieldDuration);
                 }
 
                 if (!_shieldActive && DateTimeOffset.Now > _shieldEndTime)
