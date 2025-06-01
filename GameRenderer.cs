@@ -40,6 +40,63 @@ public unsafe class GameRenderer
         _camera.LookAt(x, y);
     }
 
+    
+    // Midpoint Circle Drawing Algorithm (https://stackoverflow.com/questions/38334081/how-to-draw-circles-arcs-and-vector-graphics-in-sdl)
+    public void DrawCircle(int centerX, int centerY, int radius, byte r, byte g, byte b, byte a, bool filled = false)
+    {
+        _sdl.SetRenderDrawBlendMode(_renderer, BlendMode.Blend);
+        _sdl.SetRenderDrawColor(_renderer, r, g, b, a);
+
+        var center = _camera.ToScreenCoordinates(new Rectangle<int>(centerX, centerY, 0, 0));
+        int cx = center.Max.X;
+        int cy = center.Max.Y;
+
+        if (filled)
+        {
+            for (int w = 0; w < radius * 2; w++)
+            {
+                for (int h = 0; h < radius * 2; h++)
+                {
+                    int dx = radius - w;
+                    int dy = radius - h;
+                    if ((dx * dx + dy * dy) <= (radius * radius))
+                    {
+                        _sdl.RenderDrawPoint(_renderer, cx + dx, cy + dy);
+                    }
+                }
+            }
+        }
+        else
+        {
+            int x = radius;
+            int y = 0;
+            int err = 0;
+
+            while (x >= y)
+            {
+                _sdl.RenderDrawPoint(_renderer, cx + x, cy + y);
+                _sdl.RenderDrawPoint(_renderer, cx + y, cy + x);
+                _sdl.RenderDrawPoint(_renderer, cx - y, cy + x);
+                _sdl.RenderDrawPoint(_renderer, cx - x, cy + y);
+                _sdl.RenderDrawPoint(_renderer, cx - x, cy - y);
+                _sdl.RenderDrawPoint(_renderer, cx - y, cy - x);
+                _sdl.RenderDrawPoint(_renderer, cx + y, cy - x);
+                _sdl.RenderDrawPoint(_renderer, cx + x, cy - y);
+
+                y += 1;
+                if (err <= 0)
+                {
+                    err += 2 * y + 1;
+                }
+                if (err > 0)
+                {
+                    x -= 1;
+                    err -= 2 * x + 1;
+                }
+            }
+        }
+    }
+
     public int LoadTexture(string fileName, out TextureData textureInfo)
     {
         using (var fStream = new FileStream(fileName, FileMode.Open))
