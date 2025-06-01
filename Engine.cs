@@ -24,6 +24,10 @@ public class Engine
     
     private int _deathScreenTextureId;
     private TextureData _deathScreenTextureData;
+    
+    private bool _shieldActive = false;
+    private DateTime _shieldEndTime = DateTime.MinValue;
+    private const int ShieldDuration = 5000; 
 
     public Engine(GameRenderer renderer, Input input)
     {
@@ -123,6 +127,7 @@ public class Engine
         bool addBomb = _input.IsKeyBPressed();
 
         _player.UpdatePosition(up, down, left, right, 48, 48, msSinceLastFrame);
+        
         if (isAttacking)
         {
             _player.Attack();
@@ -154,6 +159,21 @@ public class Engine
             var srcRect = new Rectangle<int>(0, 0, _deathScreenTextureData.Width, _deathScreenTextureData.Height);
             _renderer.RenderTexture(_deathScreenTextureId, srcRect, destRect);
         }
+        
+        if (_shieldActive && DateTimeOffset.Now >= _shieldEndTime)
+        {
+            _shieldActive = false;
+        }
+        
+        if (_shieldActive && _player != null)
+        {
+            var pos = _player.Position;
+            int radius = 16; // Adjust as needed to fit the player
+            int centerX = pos.X;
+            int centerY = pos.Y - 4;
+            byte blue = 255, alpha = 50;
+            _renderer.DrawCircle(centerX, centerY, radius, 0, 0, blue, alpha, filled: true);
+        }
 
         _renderer.PresentFrame();
     }
@@ -184,7 +204,17 @@ public class Engine
             var deltaY = Math.Abs(_player.Position.Y - tempGameObject.Position.Y);
             if (deltaX < 32 && deltaY < 32)
             {
-                _player.GameOver();
+                Console.WriteLine(_player.State.State);
+                if (tempGameObject.SpriteSheet.FileName == "powerup_shield.png")
+                {
+                    _shieldActive = true;
+                    _shieldEndTime = DateTime.Now.AddMilliseconds(ShieldDuration);
+                }
+
+                if (!_shieldActive && DateTimeOffset.Now > _shieldEndTime)
+                {
+                    _player.GameOver();
+                }
             }
         }
 
@@ -246,6 +276,17 @@ public class Engine
 
         SpriteSheet spriteSheet = SpriteSheet.Load(_renderer, "BombExploding.json", "Assets");
         spriteSheet.ActivateAnimation("Explode");
+
+        TemporaryGameObject bomb = new(spriteSheet, 2.1, (worldCoords.X, worldCoords.Y));
+        _gameObjects.Add(bomb.Id, bomb);
+    }
+    
+    public void AddShield(int X, int Y)
+    {
+        var worldCoords = new Vector2D<int>(X, Y);
+
+        SpriteSheet spriteSheet = SpriteSheet.Load(_renderer, "PowerupShield.json", "Assets");
+        spriteSheet.ActivateAnimation("Display");
 
         TemporaryGameObject bomb = new(spriteSheet, 2.1, (worldCoords.X, worldCoords.Y));
         _gameObjects.Add(bomb.Id, bomb);
