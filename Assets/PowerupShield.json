@@ -1,0 +1,25 @@
+﻿{
+  "rowCount": 1,
+  "columnCount": 1,
+  "frameWidth": 32,
+  "frameHeight": 32,
+  "frameCenter": {
+    "offsetX": 16,
+    "offsetY": 16
+  },
+  "fileName": "powerup_shield.png",
+  "animations": {
+    "Display": {
+      "startFrame": {
+        "row": 0,
+        "col": 0
+      },
+      "endFrame": {
+        "row": 0,
+        "col": 0
+      },
+      "durationMs": 10000,
+      "loop": false
+    }
+  }
+}
